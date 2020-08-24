@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DOM Table</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Таблица студентов</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <table id="usersList" class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col" style="width: 30px;">Акт.</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Фамилия</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Курс</th>
+                    <th scope="col">Средний балл</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><i class="fas fa-user text-success"></i></td>
+                    <td>Макс</td>
+                    <td>Иванов</td>
+                    <td>max@mail.ru</td>
+                    <td>3</td>
+                    <td>4.8</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td><i class="fas fa-user text-danger"></i></td>
+                    <td>Степан</td>
+                    <td>Смирнов</td>
+                    <td>step@mail.ru</td>
+                    <td>1</td>
+                    <td>4.2</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td><i class="fas fa-user text-success"></i></td>
+                    <td>Роман</td>
+                    <td>Чайкин</td>
+                    <td>roma@mail.ru</td>
+                    <td>2</td>
+                    <td>5</td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <br>
+            <h5 class="alert alert-primary">Добавить студента</h5>
+
+            <form>
+
+                <div class="form-group">
+                    <label for="userFname">Имя</label>
+                    <input type="text" class="form-control" id="userFname">
+                    <small id="userFnameHelp" style="display: none;" class="form-text text-danger">Поле, обязательное для ввода</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="userSname">Фамилия</label>
+                    <input type="text" class="form-control" id="userSname">
+                    <small id="userSnameHelp" hidden class="form-text text-danger">Поле, обязательное для ввода</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="userEmail">Email адрес</label>
+                    <input type="email" class="form-control" id="userEmail">
+                    <small id="userEmailHelp" hidden class="form-text text-danger">Введен не верный Email</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="userKurs">Курс студента</label>
+                    <select class="form-control" id="userKurs">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+
+                <label for="userRank">Средний балл - <span id="showRank">2.5</span></label>
+                <input type="range" class="custom-range" min="0" max="5" step="0.1" id="userRank">
+
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="userDisabled">
+                    <label class="form-check-label" for="userDisabled">отчислен (не активен)</label>
+                </div>
+                <button id="butInsertUser" type="submit" class="btn btn-primary">Добавить студента</button>
+                <button id="butResetUser" type="reset" class="btn btn-outline-danger">Сброс формы</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="js/fn.js"></script>
+
+</body>
+</html>

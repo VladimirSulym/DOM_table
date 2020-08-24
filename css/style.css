@@ -1,0 +1,7 @@
+.table.table-striped tbody tr td:first-child {
+    font-weight: bold;
+}
+
+.table.table-striped tbody tr td:nth-of-type(2) {
+    text-align: center;
+}
