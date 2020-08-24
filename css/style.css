@@ -5,3 +5,17 @@
 .table.table-striped tbody tr td:nth-of-type(2) {
     text-align: center;
 }
+
+.table.table-striped tbody tr:hover {
+    background-color: #a9c3e9;
+    cursor: pointer;
+}
+
+.table.table-striped tbody tr:hover.editable {
+    background-color: transparent !important;
+    cursor: auto !important;
+}
+
+.btn-space {
+    margin-left: 10px;
+}

@@ -1,8 +1,98 @@
 //document.addEventListener('DOMContentLoaded', handleAddStudentButtonClick)
 
+
+let STATE = {
+    tableEditFlag: false,
+    tableRowEditIndex: null,
+    oldCellData: null,
+    fieldCellNames: ['id', 'userDisabled','userFname', 'userSname', 'userEmail', 'userKurs', 'userRank'],
+    editableTRID: 'editableTRID',
+}
+
 document.getElementById('butInsertUser').addEventListener('click', handleAddStudentButtonClick);
 document.getElementById('userRank').addEventListener('change', handleChangeRank);
-//document.querySelector('h5').addEventListener('click', insertRowToTable)
+//document.querySelector('h5').addEventListener('click', incertInfoToTr);
+
+addHandlersToTableRows();
+
+function addHandlersToTableRows () {
+    let allTRs = document.getElementById('usersList').querySelector('tbody').children;
+    for (let i=0; i<allTRs.length; i++) {
+        let oneTR = allTRs[i];
+        oneTR.addEventListener('click', handleTRClick);
+    }
+}
+
+function handleTRClick (e) {
+    let currentElement = e.currentTarget;
+    insertSaveCancelControls(currentElement);
+    // if (Array.from(currentElement.classList).includes('editable')) {
+    if (STATE.tableEditFlag) {
+        return null;
+    }
+
+    STATE.tableEditFlag = true;
+
+    currentElement.classList.add('editable');
+    let allTDs = currentElement.children;
+    let textData = '';
+    for (let i=0; i<allTDs.length; i++) {
+        let oneTD = allTDs[i];
+        if (!i) {
+            STATE.tableRowEditIndex = +oneTD.innerText - 1
+        }
+
+        let iconUserDisable = oneTD.querySelector('i')
+        if (iconUserDisable){
+            let iconUserDisableValue = Array.from(iconUserDisable.classList).includes('text-danger')
+            creatSelectForTableCell(oneTD, iconUserDisableValue);
+            saveBacupData(i, iconUserDisableValue);
+        } else {
+            textData = oneTD.innerText;
+            creatInputForTableCell(oneTD, textData);
+            saveBacupData(i, textData);
+        }
+    }
+}
+
+function saveBacupData (index, cellData) {
+    let oldCellData = STATE.oldCellData || {};
+    let field = STATE.fieldCellNames[index];
+    oldCellData[field]=cellData;
+
+    STATE.oldCellData = oldCellData;
+}
+
+function creatInputForTableCell (parent, text) {
+    let inpunEl = document.createElement('input');
+    inpunEl.setAttribute('type', 'text');
+    inpunEl.className = 'form-control';
+    inpunEl.value = text;
+    parent.innerHTML ='';
+    parent.appendChild(inpunEl);
+}
+
+function creatSelectForTableCell (parent, value) {
+    let selectEl = document.createElement('select');
+    let option1 = document.createElement('option');
+    let option2 = document.createElement('option');
+    selectEl.className = 'form-control';
+    parent.innerHTML ='';
+    parent.appendChild(selectEl);
+    selectEl.appendChild(option1);
+    selectEl.appendChild(option2);
+    option1.innerText = 'Нет';
+    option2.innerText = 'Да';
+
+    option1.setAttribute('value', 'Нет');
+    option2.setAttribute('value', 'Да');
+    if (value) {
+        option1.setAttribute('selected', 'true');
+    } else {
+        option2.setAttribute('selected', 'true');
+    }
+
+}
 
 function handleAddStudentButtonClick (e) {
     // userFname userSname userEmail userKurs userRank userDisabled
@@ -15,7 +105,6 @@ function handleAddStudentButtonClick (e) {
         userRank: document.getElementById('userRank').value,
         userDisabled: document.getElementById('userDisabled').checked,
     }
-    console.log(`User data`, data);
 
     if (!data.userFname.trim().length) {
         let Fname = document.getElementById('userFname');
@@ -62,7 +151,7 @@ function insertRowToTable (data) {
     tbody.appendChild(newTR);
 
 
-    let arrTD = ['id', 'userDisabled','userFname', 'userSname', 'userEmail', 'userKurs', 'userRank'];
+    let arrTD = STATE.fieldCellNames;
     arrTD.forEach(function (value) {
         let newTD = document.createElement('td');
         if (value === 'id'){
@@ -79,4 +168,49 @@ function insertRowToTable (data) {
 function handleChangeRank (e) {
     //document.getElementById('showRank').innerText = document.getElementById('userRank').value;
     e.target.parentElement.querySelector('span').innerText = document.getElementById('userRank').value;
+}
+
+function insertSaveCancelControls (previoserTR) {
+
+    if (STATE.tableEditFlag) {
+        return null;
+    }
+
+    let newTR = document.createElement('tr');
+    newTR.className = 'editable';
+    newTR.setAttribute('id', STATE.editableTRID);
+    newTR.innerHTML = '<td colspan="7" align="center">\n' +
+        '<button type="button" class="btn btn-outline-success">Сохранить</button>' +
+        '<button onclick="cancelEdit()" type="button" class="btn btn-outline-secondary btn-space">Отменить</button>' +
+        '<button type="button" class="btn btn-outline-danger btn-space">Удалить</button>' +
+        '</td>';
+    let parent = previoserTR.parentElement;
+    parent.insertBefore(newTR, previoserTR.nextSibling);
+}
+
+function cancelEdit () {
+    let editControls = document.getElementById(STATE.editableTRID);
+    let parent = editControls.parentElement;
+    parent.removeChild(editControls);
+    let editableTR = parent.querySelector('.editable');
+    incertInfoToTr(STATE.oldCellData, editableTR);
+}
+
+function incertInfoToTr (values, trToOperate) {
+    let childTR = trToOperate.children;
+    for (let i=0; i < childTR.length; i++) {
+        let oneCell = childTR[i];
+        oneCell.innerText ='';
+
+        let field = STATE.fieldCellNames[i];
+        let textData = values [field];
+
+        if (field === 'userDisabled') {
+            let icon = document.createElement('i');
+            icon.className = 'fas fa-user text-'+ (textData ? 'danger' : 'success');
+            oneCell.appendChild(icon);
+        } else {
+            oneCell.innerText = textData;
+        }
+    }
 }
