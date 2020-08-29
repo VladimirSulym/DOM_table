@@ -1,6 +1,4 @@
 //document.addEventListener('DOMContentLoaded', handleAddStudentButtonClick)
-
-
 let STATE = {
     tableEditFlag: false,
     tableRowEditIndex: null,
@@ -9,9 +7,49 @@ let STATE = {
     editableTRID: 'editableTRID',
 }
 
+let dataStub = [];
+
+function fillInDate () {
+    let tbody = document.getElementById("usersList").querySelector('tbody');
+    const tr = tbody.children;
+    for (let i = 0; i < tr.length; i++) {
+        let data = {};
+        let td = tr[i].children;
+        for (let k = 0; k < td.length; k++) {
+            let item = td[k].innerText;
+            if (k === 1) {
+                item = td[k].querySelector('.text-success') ? false : true;
+            }
+            data[STATE.fieldCellNames[k]] = item;
+        }
+        dataStub[i] = data;
+    }
+}
+
+fillInDate();
+localStor();
+
+function localStor () {
+if (localStorage.getItem('myData')) {
+    dataStub = JSON.parse(localStorage.getItem('myData'));
+} else {
+    localStorage.setItem("myData", JSON.stringify(dataStub));
+}
+}
+
+buildTable();
+
+function buildTable () {
+    document.getElementById("usersList").querySelector('tbody').innerHTML = '';
+
+    for (let i=0; i < dataStub.length; i++){
+        insertRowToTable(dataStub[i]);
+    }
+}
+
 document.getElementById('butInsertUser').addEventListener('click', handleAddStudentButtonClick);
 document.getElementById('userRank').addEventListener('change', handleChangeRank);
-//document.querySelector('h5').addEventListener('click', incertInfoToTr);
+document.querySelector('h5').addEventListener('click', buildTable);
 
 addHandlersToTableRows();
 
@@ -100,13 +138,16 @@ function handleAddStudentButtonClick (e) {
     // userFname userSname userEmail userKurs userRank userDisabled
     e.preventDefault();
     let data = {
+        id: `${document.getElementById('usersList').querySelector('tbody').children.length + 1}`,
+        userDisabled: document.getElementById('userDisabled').checked,
         userFname: document.getElementById('userFname').value,
         userSname: document.getElementById('userSname').value,
         userEmail: document.getElementById('userEmail').value,
         userKurs: document.getElementById('userKurs').value,
         userRank: document.getElementById('userRank').value,
-        userDisabled: document.getElementById('userDisabled').checked,
     }
+
+    console.log(data);
 
     if (!data.userFname.trim().length) {
         let Fname = document.getElementById('userFname');
@@ -135,7 +176,9 @@ function handleAddStudentButtonClick (e) {
         Email.parentElement.querySelector('#userEmailHelp').removeAttribute('hidden');
     }
 
-    insertRowToTable(data);
+    dataStub.push(data);
+    localStorage.setItem("myData", JSON.stringify(dataStub));
+    buildTable();
     e.target.closest('form').reset();
 }
 
@@ -151,7 +194,6 @@ function insertRowToTable (data) {
     let newTR = document.createElement('tr');
     let totalRow = tbody.childElementCount;
     tbody.appendChild(newTR);
-
 
     let arrTD = STATE.fieldCellNames;
     arrTD.forEach(function (value) {
@@ -249,3 +291,4 @@ function handleUpdateDataInCells () {
     const editableTR = parent.querySelector('.editable');
     incertInfoToTr(newDateForCells, editableTR)
 }
+
