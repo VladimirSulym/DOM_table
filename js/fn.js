@@ -45,11 +45,11 @@ function handleTRClick (e) {
         let iconUserDisable = oneTD.querySelector('i')
         if (iconUserDisable){
             let iconUserDisableValue = Array.from(iconUserDisable.classList).includes('text-danger')
-            creatSelectForTableCell(oneTD, iconUserDisableValue);
+            creatSelectForTableCell(oneTD, iconUserDisableValue, STATE.fieldCellNames[i]);
             saveBacupData(i, iconUserDisableValue);
         } else {
             textData = oneTD.innerText;
-            creatInputForTableCell(oneTD, textData);
+            creatInputForTableCell(oneTD, textData, STATE.fieldCellNames[i]);
             saveBacupData(i, textData);
         }
     }
@@ -63,17 +63,19 @@ function saveBacupData (index, cellData) {
     STATE.oldCellData = oldCellData;
 }
 
-function creatInputForTableCell (parent, text) {
+function creatInputForTableCell (parent, text, fieldName) {
     let inpunEl = document.createElement('input');
     inpunEl.setAttribute('type', 'text');
+    inpunEl.setAttribute('id', fieldName+'Inline');
     inpunEl.className = 'form-control';
     inpunEl.value = text;
     parent.innerHTML ='';
     parent.appendChild(inpunEl);
 }
 
-function creatSelectForTableCell (parent, value) {
+function creatSelectForTableCell (parent, value, fieldName) {
     let selectEl = document.createElement('select');
+    selectEl.setAttribute('id', fieldName+'Inline');
     let option1 = document.createElement('option');
     let option2 = document.createElement('option');
     selectEl.className = 'form-control';
@@ -180,20 +182,20 @@ function insertSaveCancelControls (previoserTR) {
     newTR.className = 'editable';
     newTR.setAttribute('id', STATE.editableTRID);
     newTR.innerHTML = '<td colspan="7" align="center">\n' +
-        '<button type="button" class="btn btn-outline-success">Сохранить</button>' +
-        '<button onclick="cancelEdit()" type="button" class="btn btn-outline-secondary btn-space">Отменить</button>' +
-        '<button type="button" class="btn btn-outline-danger btn-space">Удалить</button>' +
+        '<button onclick="handleUpdateDataInCells()" type="button" class="btn btn-outline-success">Сохранить</button>' +
+        '<button onclick="handleCancelEdit()" type="button" class="btn btn-outline-secondary btn-space">Отменить</button>' +
+        '<button onclick="handleDeleteRow()" type="button" class="btn btn-outline-danger btn-space">Удалить</button>' +
         '</td>';
     let parent = previoserTR.parentElement;
     parent.insertBefore(newTR, previoserTR.nextSibling);
 }
 
-function cancelEdit () {
-    let editControls = document.getElementById(STATE.editableTRID);
-    let parent = editControls.parentElement;
-    parent.removeChild(editControls);
+function handleCancelEdit () {
+    const oldCellData = STATE.oldCellData;
+    const parent = remuveEditControlsTable();
     let editableTR = parent.querySelector('.editable');
-    incertInfoToTr(STATE.oldCellData, editableTR);
+    incertInfoToTr(oldCellData, editableTR);
+
 }
 
 function incertInfoToTr (values, trToOperate) {
@@ -213,4 +215,37 @@ function incertInfoToTr (values, trToOperate) {
             oneCell.innerText = textData;
         }
     }
+}
+
+function handleDeleteRow () {
+    const parent = remuveEditControlsTable();
+    const editableTR = parent.querySelector('.editable');
+    parent.removeChild(editableTR);
+}
+
+function remuveEditControlsTable () {
+    const editControl = document.getElementById(STATE.editableTRID);
+    const parent = editControl.parentElement;
+    parent.removeChild(editControl);
+
+    STATE.tableEditFlag = false;
+    STATE.oldCellData = null;
+
+    return parent;
+
+}
+
+function handleUpdateDataInCells () {
+    const parent = remuveEditControlsTable();
+    let newDateForCells = {};
+
+    STATE.fieldCellNames.forEach(function (item, index) {
+        let text = document.getElementById(item+'Inline').value;
+        if ("userDisabled" === item) {
+            text = text === "Да" ? false : true;
+        }
+        newDateForCells[ item ] = text;
+        });
+    const editableTR = parent.querySelector('.editable');
+    incertInfoToTr(newDateForCells, editableTR)
 }
